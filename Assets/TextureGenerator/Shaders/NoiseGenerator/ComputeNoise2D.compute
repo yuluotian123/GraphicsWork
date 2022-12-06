@@ -1,0 +1,138 @@
+#pragma kernel ComputeNoise
+#pragma kernel PerlinWorleyNoise
+#pragma kernel Turbulence
+#pragma kernel Ridged
+#pragma multi_compile _ _PERLIN_NOISE _VALUE_NOISE _SIMPLEX_NOISE _WORLEY_NOISE 
+#pragma multi_compile _ _ISTILE
+#pragma multi_compile _ _ISFBM
+
+#include "Assets/TextureGenerator/ShaderLibrary/Noises/Noise.hlsl"
+
+RWTexture2D<float4> Result;
+
+float _Width;
+float _Height;
+float _Scale;
+float3 _Offset;
+float _Contrast;
+float _Bright;
+float _Freq;
+float _Counts;
+
+#ifdef _ISFBM
+#define GETNOISE(UV) FBM(UV,_Counts) 
+#else
+#define GETNOISE(UV) Noise(UV) 
+#endif
+
+float Adjust(float r)
+{
+    return (r - 0.5) * _Contrast + _Bright - 0.5;
+}
+
+float Encode(float r)
+{
+    return r * 0.5 + 0.5;
+}
+
+[numthreads(16, 16, 1)]
+void ComputeNoise(uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = float2(id.x / _Width * _Scale + _Offset.x, id.y / _Height * _Scale + _Offset.y);
+    
+    float r = GETNOISE(uv);
+ 
+#ifdef _ISTILE
+    
+#ifdef _PERLIN_NOISE
+    
+#ifdef _ISFBM
+    r = FBMperlin_noise_tile(uv,_Freq,_Counts);
+#else
+    r = perlin_noise_tile(uv,_Freq);
+#endif
+    
+#else
+    
+#ifdef _ISFBM
+     r = FBMworley_noise_tile(uv+0.33,_Freq,_Counts);
+#else
+    r = worley_noise_tile(uv+0.33,_Freq);
+#endif
+    
+#endif
+    
+#endif
+   
+#if _PERLIN_NOISE|| _VALUE_NOISE||_SIMPLEX_NOISE
+    r = Encode(r);
+#endif
+    
+    r = (r - 0.5) * _Contrast + _Bright - 0.5;
+    
+    Result[id.xy] = float4(r,r,r,1);
+}
+
+float worleyFBM3(float3 xyz, float freq)
+{
+    return worley_noise_tile(xyz, freq) * .625 +
+        	 worley_noise_tile(xyz, freq * 2.) * .25 +
+        	 worley_noise_tile(xyz, freq * 4.) * .125;
+}
+float perlinFBM(float3 p, float freq, int octaves)
+{
+    float G = exp2(-.85);
+    float amp = 1.;
+    float noise = 0.;
+    for (int i = 0; i < octaves; ++i)
+    {
+        noise += amp * perlin_noise_tile(p, freq);
+        freq *= 2.;
+        amp *= G;
+    }
+    
+    return noise;
+}
+
+[numthreads(16, 16, 1)]
+void PerlinWorleyNoise(uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = float2(id.x / _Width * _Scale + _Offset.x, id.y / _Height * _Scale + _Offset.y);
+    
+    float3 xyz = float3(uv, 1);
+    
+    float pfbm = lerp(1., perlinFBM(xyz, _Freq, _Counts), .5);
+    pfbm = abs(pfbm * 2. - 1.);
+    
+    float wfbm = worleyFBM3(xyz, _Freq);
+    
+    float r = Remap(pfbm, 0., 1., wfbm, 1.);
+    
+    r = Adjust(r);
+
+    Result[id.xy] = float4(r, r, r, 1);
+}
+
+[numthreads(16, 16, 1)]
+void Turbulence(uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = float2(id.x / _Width * _Scale + _Offset.x, id.y / _Height * _Scale + _Offset.y);
+    
+    float r = turbulence(uv,_Counts);
+    
+    r = Adjust(Encode(r));
+    
+    Result[id.xy] = float4(r, r, r, 1);
+}
+
+[numthreads(16, 16, 1)]
+void Ridged(uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = float2(id.x / _Width * _Scale + _Offset.x, id.y / _Height * _Scale + _Offset.y);
+    
+    float r = ridged(uv,_Counts);
+
+    r = Adjust(Encode(r));
+    
+    Result[id.xy] = float4(r, r, r, 1);
+}

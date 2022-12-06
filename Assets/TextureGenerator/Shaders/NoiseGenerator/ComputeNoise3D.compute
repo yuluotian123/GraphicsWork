@@ -1,0 +1,89 @@
+﻿#pragma kernel ComputeNoise
+#pragma multi_compile _ NOISE_1 NOISE_2
+
+#include "Assets/TextureGenerator/ShaderLibrary/Noises/Noise.hlsl"
+RWTexture3D<float4> Result;
+
+float _Width;
+float _Height;
+float _Depth;
+
+float _Scale;
+float3 _Offset;
+
+float adjust(float r, float contrast, float bright)
+{
+    return (r - .5) * contrast + bright - .5;
+}
+
+float worleyFBM3(float3 xyz, float freq)
+{
+    return worley_noise_tile(xyz , freq) * .625 +
+        	 worley_noise_tile(xyz , freq * 2.) * .25 +
+        	 worley_noise_tile(xyz , freq * 4.) * .125;
+}
+float perlinFBM(float3 p, float freq, int octaves)
+{
+    float G = exp2(-.85);
+    float amp = 1.;
+    float noise = 0.;
+    for (int i = 0; i < octaves; ++i)
+    {
+        noise += amp * perlin_noise_tile(p, freq);
+        freq *= 2.;
+        amp *= G;
+    }
+    
+    return noise;
+}
+
+float4 Noise3DGen1(float3 xyz)
+{
+    float freq = 4;
+    float4 color = float4(0, 0, 0, 0);
+    
+    
+    float pfbm = lerp(1., perlinFBM(xyz, 4., 7), .5);
+    pfbm = abs(pfbm * 2. - 1.);
+    
+    xyz += .33;
+    
+    color.r += Remap(pfbm, 0., 1., worleyFBM3(xyz, freq), 1.);
+    color.r = adjust(color.r, 1, 1.1);
+    
+    color.g += adjust(worleyFBM3(xyz, freq), 0.9, 1);
+    color.b += adjust(worleyFBM3(xyz, freq * 2.), 0.9, 1);
+    color.a += adjust(worleyFBM3(xyz, freq * 4.), 0.9, 1);
+    
+    return color;
+}
+
+float4 Noise3DGen2(float3 xyz)
+{
+    
+    float freq = 4;
+    float4 color = float4(0, 0, 0, 0);
+    
+    xyz += .22;
+    
+    color.r += adjust(worleyFBM3(xyz, freq), 0.8, 1);
+    color.g += adjust(worleyFBM3(xyz, freq*2.), 0.9, 1);
+    color.b += adjust(worleyFBM3(xyz, freq * 4.), 0.9, 1);
+    color.a += adjust(worleyFBM3(xyz, freq), 0.9, 1);
+    
+    return color;
+}
+
+#if defined(NOISE_1)
+#define GETNOISE3D Noise3DGen1
+#elif defined(NOISE_2)
+#define GETNOISE3D Noise3DGen2
+#endif
+
+[numthreads(8, 8, 8)]
+void ComputeNoise(uint3 id : SV_DispatchThreadID)
+{
+    float3 xyz = float3(id.x/_Width,id.y/_Height,id.z/_Depth)*_Scale+_Offset;
+    
+    Result[id.xyz] = GETNOISE3D(xyz);
+}

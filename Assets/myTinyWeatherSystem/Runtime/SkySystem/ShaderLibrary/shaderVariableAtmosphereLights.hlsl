@@ -1,0 +1,14 @@
+﻿#ifndef YU_ATMOSPHERELIGHTS_COMMON_INCLUDE
+#define YU_ATMOSPHERELIGHTS_COMMON_INCLUDE
+#define MAX_LIGHT_COUNTS 2
+
+float4 _AtmosphereLightDirection[MAX_LIGHT_COUNTS];
+float4 _AtmosphereLightIlluminanceOuterSpace[MAX_LIGHT_COUNTS];
+float _AtmosphereLightDiskCosHalfApexAngle[MAX_LIGHT_COUNTS];
+float4 _AtmosphereLightDiskLuminance[MAX_LIGHT_COUNTS];
+float _ShadowCloudStrength[MAX_LIGHT_COUNTS];
+float _ShadowCloudResolution[MAX_LIGHT_COUNTS];
+
+int _AtmosphereLightDiskEnable0;
+int _AtmosphereLightDiskEnable1;
+#endif
