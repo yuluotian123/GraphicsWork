@@ -537,7 +537,6 @@ namespace UnityEngine.Rendering.Universal
                 if (feature == null)
                     continue;
 
-                Debug.Log("On Ctor");
                 feature.Create();
                 m_RendererFeatures.Add(feature);
             }
