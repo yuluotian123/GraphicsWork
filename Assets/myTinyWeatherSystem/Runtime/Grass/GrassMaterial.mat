@@ -11,6 +11,7 @@ Material:
   m_Shader: {fileID: 4800000, guid: 2b87e14186ab15f41967e87a6b26abf0, type: 3}
   m_ValidKeywords:
   - _NORMALUP_ON
+  - _SHADOWCAST_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -38,7 +39,7 @@ Material:
     - _LodDis2: 500
     - _NormalUp: 1
     - _Radius: 2
-    - _ShadowCast: 0
+    - _ShadowCast: 1
     - _SpecIntensity: 0.5
     - _Strength: 3
     - _Width: 0.03
