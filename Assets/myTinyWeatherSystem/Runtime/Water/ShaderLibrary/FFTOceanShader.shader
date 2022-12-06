@@ -190,6 +190,7 @@ ENDHLSL
 
     SubShader
     {
+
     Tags {  "RenderPipeline"="UniversalPipeline" "RenderType" = "Transparent" }
 	Pass
 	{
@@ -206,5 +207,6 @@ ENDHLSL
 
 	ENDHLSL
 	}
+
     }
 }
