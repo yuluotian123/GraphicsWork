@@ -47,7 +47,7 @@ TEXTURECUBE(_ReflectionTexture);        SAMPLER(sampler_ReflectionTexture);
 TEXTURE2D(_DisplaceTexture);            SAMPLER(sampler_DisplaceTexture);
 TEXTURE2D(_NormalTexture);              SAMPLER(sampler_NormalTexture);
 TEXTURE2D(_BubblesTexture);             SAMPLER(sampler_BubblesTexture);
-TEXTURE2D(_BubblesSSSTexture);          SAMPLER(sampler_BubblesSSSTexture);\
+TEXTURE2D(_BubblesSSSTexture);          SAMPLER(sampler_BubblesSSSTexture);
 TEXTURE2D_X_FLOAT(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture);
      
 TessellationControlPoint TessellationVertex(appdata_base v)
@@ -179,10 +179,15 @@ float4 frag(v2f i, float facing : VFACE) : SV_Target{
 	   rtReflections += SAMPLE_TEXTURECUBE(_ReflectionTexture,sampler_ReflectionTexture,reflectDir);
 #endif
 	   
+	   //refract
+	   half3 refractVector = normalize(refract(-viewVector, worldNormal, max(1 + _Refract, 1)));
+
+	   float Depth = WaterDepth(i.worldPos);
+
 	   //float bubbles = SAMPLE_TEXTURE2D(_BubblesTexture,sampler_BubblesTexture,i.uv).r;
 	   //float SSSMask = SAMPLE_TEXTURE2D(_BubblesSSSTexture,sampler_BubblesSSSTexture,i.uv).r;
 
-	   return float4(rtReflections);
+	   return float4(Depth,0,0,1);
 }
 
 

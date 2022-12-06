@@ -4,6 +4,11 @@
 #include "shaderVariableWater.cs.hlsl"
 #define G 9.81f
 #define MAX_TESSELLATION_FACTORS 32.0 
+#define HeightExtra 4.0f
+
+TEXTURE2D_X_FLOAT(_WaterDepthTexture);   SAMPLER(sampler_WaterDepthTexture_linear_clamp);
+float4 _WaterDepthParams;//xyz:camPosition w:camSize
+
 float Fade(float3 d)
 {
 	//on some gpus need float precision
@@ -77,6 +82,13 @@ float DonelanBannerDirectionalSpreading(float2 k)
 
     return betaS / max(1e-7f, 2.0f * tanh(betaS * PI) * pow(cosh(betaS * theta), 2));
 }
-//º∆À„ReflectionTexture
+//º∆À„Depth
+float WaterDepth(float3 posWS)
+{
+    float2 uv = (posWS.xz - _WaterDepthParams.xz) / (_WaterDepthParams.w);
+    uv = uv * .5 + .5;
+    float Depth = (1 - SAMPLE_TEXTURE2D_LOD(_WaterDepthTexture, sampler_WaterDepthTexture_linear_clamp, uv, 0).r) * (HeightExtra + _MaxDepth) - _WaterDepthParams.y;
+    return Depth + posWS.y;
+}
 
 #endif

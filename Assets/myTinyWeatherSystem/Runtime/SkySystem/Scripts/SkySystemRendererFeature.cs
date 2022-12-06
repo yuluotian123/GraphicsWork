@@ -118,6 +118,8 @@ namespace Yu_Weather
             //release上一个相机的数据
             viewSkyInfo.Release();
 
+            if (renderingData.cameraData.targetTexture != null && renderingData.cameraData.targetTexture.format == RenderTextureFormat.Depth) return;
+
             //更新相机相关的数据
             viewSkyInfo.Update(ref renderingData.cameraData, skyAC);
 

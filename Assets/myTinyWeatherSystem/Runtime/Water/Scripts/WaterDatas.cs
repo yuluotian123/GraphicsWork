@@ -199,7 +199,7 @@ namespace Yu_Weather
             renderParameters._ShallowColor = fftOcean.shallowColor;
 
             renderParameters._Transparency = fftOcean.transparency;
-            renderParameters._ShallowDepth = fftOcean.shallowDepth;
+            renderParameters._MaxDepth = fftOcean.maxDepth;
             renderParameters._Fade = fftOcean.fade;
             renderParameters._Fresnel = fftOcean.depth;
 

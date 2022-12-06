@@ -17,9 +17,10 @@ namespace Yu_Weather
         public class PlanarReflectionSettings
         {
             public ResolutionMulltiplier m_ResolutionMultiplier = ResolutionMulltiplier.Third;
-            public float m_ClipPlaneOffset = 0.07f;
+            public float m_ClipPlaneOffset = 0.03f;
             public LayerMask m_ReflectLayers = -1;
             public bool m_Shadows;
+            public bool m_postProcess;
         }
 
         [SerializeField]
@@ -97,7 +98,6 @@ namespace Yu_Weather
             var cameraData = go.AddComponent(typeof(UniversalAdditionalCameraData)) as UniversalAdditionalCameraData;
 
             cameraData.requiresColorOption = CameraOverrideOption.Off;
-            cameraData.requiresDepthOption = CameraOverrideOption.Off;
             cameraData.requiresDepthTexture = true;
             cameraData.renderShadows = false;
 
@@ -139,6 +139,7 @@ namespace Yu_Weather
             if (dest.gameObject.TryGetComponent(out UniversalAdditionalCameraData camData))
             {  
                 camData.renderShadows = m_settings.m_Shadows; // turn off shadows for the reflection camera
+                camData.renderPostProcessing = m_settings.m_postProcess;
             }
         }
 

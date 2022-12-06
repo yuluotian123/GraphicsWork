@@ -28,7 +28,7 @@ GLOBAL_CBUFFER_START(shaderVariableWaterRendering, b4)
     float4 _BaseColor;
     float4 _ShallowColor;
     float _Transparency;
-    float _ShallowDepth;
+    float _MaxDepth;
     float _Fade;
     float _Fresnel;
     float _Depth;

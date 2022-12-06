@@ -32,7 +32,7 @@ namespace Yu_Weather
         public Vector4 _ShallowColor;
 
         public float _Transparency;
-        public float _ShallowDepth;
+        public float _MaxDepth;
         public float _Fade;
         public float _Fresnel;
 

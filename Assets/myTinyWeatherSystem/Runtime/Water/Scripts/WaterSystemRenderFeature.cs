@@ -76,8 +76,9 @@ namespace Yu_Weather
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
             bRenderAerialPerspective = TryGetCurrentSkyViewInfoAndShouldRenderSkyAerialPerspective();
-
             renderData.ReleasePerCamera();
+
+            if (renderingData.cameraData.targetTexture != null && renderingData.cameraData.targetTexture.format == RenderTextureFormat.Depth) return;
 
             renderData.UpdatePerCamera(ref viewSkyInfo, bRenderAerialPerspective, fftOceanComponent);
 
