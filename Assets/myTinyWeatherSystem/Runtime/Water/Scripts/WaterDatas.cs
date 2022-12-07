@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.SocialPlatforms;
+using UnityEngine.Experimental.Rendering;
 
 namespace Yu_Weather
 {
@@ -175,6 +172,9 @@ namespace Yu_Weather
     {
         public shaderVariableWaterRendering renderParameters;
 
+        public Texture2D RampTexture;
+        public Texture2D CausticsTexture;
+
         public RenderTexture ReflectionTexture;
         public ReflectionMode reflectionMode;
 
@@ -191,27 +191,58 @@ namespace Yu_Weather
             UpdateShaderVariable(fftOcean);
 
             reflectionMode = fftOcean.reflectionMode;
+
+            //to do
+            if (fftOcean.CausticsTexture == null)
+            {
+
+            }
+            else
+                CausticsTexture = fftOcean.CausticsTexture;
+
+            if (RampTexture == null)
+            {
+                RampTexture = new Texture2D(128, 4, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None);
+
+                RampTexture.wrapMode = TextureWrapMode.Clamp;
+
+                var defaultFoamRamp = fftOcean.defaultRampTex;
+
+                var cols = new Color[512];
+                for (var i = 0; i < 128; i++)
+                {
+                    cols[i] = fftOcean.absorptionRamp.Evaluate(i / 128f);
+                }
+                for (var i = 0; i < 128; i++)
+                {
+                    cols[i + 128] = fftOcean.scatterRamp.Evaluate(i / 128f);
+                }
+                for (var i = 0; i < 128; i++)
+                {
+
+                    cols[i + 256] = defaultFoamRamp.GetPixelBilinear(i / 128f, 0.5f);
+                }
+                RampTexture.SetPixels(cols);
+                RampTexture.Apply();
+            }
         }
 
         public void UpdateShaderVariable(FFTOcean fftOcean)
         {
-            renderParameters._BaseColor = fftOcean.BaseColor;
-            renderParameters._ShallowColor = fftOcean.shallowColor;
-
-            renderParameters._Transparency = fftOcean.transparency;
+            renderParameters._HeightExtra = fftOcean.depthExtra;
             renderParameters._MaxDepth = fftOcean.maxDepth;
+            renderParameters._Shininess = fftOcean.shinness;
             renderParameters._Fade = fftOcean.fade;
-            renderParameters._Fresnel = fftOcean.depth;
 
-            renderParameters._Depth = fftOcean.depth;
+            renderParameters._Fresnel = fftOcean.fresnel;
             renderParameters._Reflect = fftOcean.reflect;
             renderParameters._Refract = fftOcean.refract;
             renderParameters._NormalPower = fftOcean.normalStrength;
 
-            renderParameters._Shadow = fftOcean.shadow;
-            renderParameters._Shininess = fftOcean.shinness;
-            renderParameters._SSSscale = fftOcean.sssScale;
             renderParameters._NormalBias = fftOcean.normalBias;
+            renderParameters._Shadow = fftOcean.shadow;
+            renderParameters._SSSPow = fftOcean.sssPow;
+            renderParameters._SSSscale = fftOcean.sssScale;
 
             renderParameters._SSSColor = fftOcean.SSSColor;
     }
@@ -251,5 +282,7 @@ namespace Yu_Weather
         public readonly int renderParametersID = Shader.PropertyToID("shaderVariableWaterRendering");
         public readonly int _ReflectionTexture = Shader.PropertyToID("_ReflectionTexture");
         public readonly int _BubblesSSSTexture = Shader.PropertyToID("_BubblesSSSTexture");
+        public readonly int _AbsorptionScatteringRamp = Shader.PropertyToID("_AbsorptionScatteringRamp");
+        public readonly int _CausticsTexture = Shader.PropertyToID("_CausticsTexture");
     }
 }

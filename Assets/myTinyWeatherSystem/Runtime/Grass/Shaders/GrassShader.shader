@@ -33,7 +33,7 @@ Shader "Yu_Weather/GrassShader"
 
     SubShader
     {
-        Tags { "RenderPipeline"="UniversalRenderPipeline" "RenderType"="TransparentCutOut" "Quenue"="Transparent" "Layer"="Grass"}
+        Tags { "RenderPipeline"="UniversalRenderPipeline""RenderType" ="TransparentCutout" "Queue"="Transparent" "Layer"="Grass"}
         LOD 100
         Cull Off
         HLSLINCLUDE

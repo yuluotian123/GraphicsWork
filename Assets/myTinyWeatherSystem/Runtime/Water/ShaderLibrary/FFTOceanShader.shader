@@ -9,6 +9,13 @@ HLSLINCLUDE
 #pragma multi_compile _ USE_REFLECTION_PROBE USE_REFLECTION_PLANAR
 #pragma multi_compile _ RENDER_AP
 
+ // Lightweight Pipeline keywords
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+#pragma multi_compile _ _SHADOWS_SOFT
+
 #include "Assets/myTinyWeatherSystem/Runtime/SkySystem/ShaderLibrary/SkyAtmosphereCommon.hlsl"
 #include "WaterCommon.hlsl"
 
@@ -48,8 +55,10 @@ TEXTURE2D(_DisplaceTexture);            SAMPLER(sampler_DisplaceTexture);
 TEXTURE2D(_NormalTexture);              SAMPLER(sampler_NormalTexture);
 TEXTURE2D(_BubblesTexture);             SAMPLER(sampler_BubblesTexture);
 TEXTURE2D(_BubblesSSSTexture);          SAMPLER(sampler_BubblesSSSTexture);
-TEXTURE2D_X_FLOAT(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture);
-     
+
+TEXTURE2D(_CameraOpaqueTexture);        SAMPLER(sampler_CameraOpaqueTexture_linear_clamp);
+TEXTURE2D_X_FLOAT(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture_linear_clamp);
+
 TessellationControlPoint TessellationVertex(appdata_base v)
 {
        TessellationControlPoint p;
@@ -148,19 +157,31 @@ float4 frag(v2f i, float facing : VFACE) : SV_Target{
 
        float2 ior = (i.screenPos.xy) / i.screenPos.w;
 
-	   float3 worldNormal = TransformObjectToWorldNormal(SAMPLE_TEXTURE2D(_NormalTexture,sampler_NormalTexture,i.uv).xyz);
-	   float3 worldNormal2 = worldNormal;
-	   worldNormal.y *= _NormalPower;
-	   worldNormal2 *= _NormalBias;
+	   //view Direction Datas
+	   float3 viewPos = TransformWorldToView(i.worldPos.xyz);
 	   float3 viewVector = (_WorldSpaceCameraPos - i.worldPos.xyz);
+
+	   float viewDirUnit = length(viewPos / viewPos.z); // distance to surface unit(不知道该怎么称呼)
+	   float viewLength = length(viewVector);
 	   float fade = Fade(viewVector);
 	   viewVector = normalize(viewVector);
 
 	   //compute WorldNormal
+	   float3 worldNormal = TransformObjectToWorldNormal(SAMPLE_TEXTURE2D(_NormalTexture,sampler_NormalTexture,i.uv).xyz);
+	   float3 worldNormal2 = worldNormal;
+	   worldNormal.y *= _NormalPower;
+	   worldNormal2 *= _NormalBias;
 	   float3 worldUp = float3(0,1,0);
-	   worldNormal = normalize(lerp(worldUp, worldNormal, fade));//for fresnel
+	   worldNormal = normalize(lerp(worldUp, worldNormal, fade));//for fresnel（根据距离衰减！！）
 	   worldNormal2 = normalize(worldNormal2);
 
+	   //depth
+	   float waterDepth = WaterDepth(i.worldPos);
+	   float rawCamDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture_linear_clamp, ior).r;
+	   float viewDepth = max(0, LinearEyeDepth(rawCamDepth,_ZBufferParams) - _ProjectionParams.y);
+	   viewDepth = viewDepth * viewDirUnit - viewLength;//获取从水面到地面的距离（从相机的角度）
+	   half depthMulti = 1 / _MaxDepth;
+	   
 	   //fersnel
 	   half dotNV = saturate(dot(viewVector, worldNormal));
 	   half fresnelPow = 5;
@@ -178,16 +199,26 @@ float4 frag(v2f i, float facing : VFACE) : SV_Target{
        float3 reflectDir = reflect(-viewVector, rnormal);
 	   rtReflections += SAMPLE_TEXTURECUBE(_ReflectionTexture,sampler_ReflectionTexture,reflectDir);
 #endif
+
+       //ambient
+	   float3 ambientCol = SHIndirectDiffuse(worldNormal);
+
+	   //Lighting
+	   Light mainLight = GetMainLight(TransformWorldToShadowCoord(i.worldPos.xyz));
+       half shadow = MainLightRealtimeShadow(TransformWorldToShadowCoord(i.worldPos.xyz));
+	   shadow = lerp(1 - _Shadow, 1, shadow);
+
+	   //SSS
+	   float SSSMask = SAMPLE_TEXTURE2D(_BubblesSSSTexture,sampler_BubblesSSSTexture,i.uv).r;
+
 	   
 	   //refract
 	   half3 refractVector = normalize(refract(-viewVector, worldNormal, max(1 + _Refract, 1)));
 
-	   float Depth = WaterDepth(i.worldPos);
 
 	   //float bubbles = SAMPLE_TEXTURE2D(_BubblesTexture,sampler_BubblesTexture,i.uv).r;
-	   //float SSSMask = SAMPLE_TEXTURE2D(_BubblesSSSTexture,sampler_BubblesSSSTexture,i.uv).r;
 
-	   return float4(Depth,0,0,1);
+	   return float4(ambientCol,1);
 }
 
 

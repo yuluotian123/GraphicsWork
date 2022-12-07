@@ -21,6 +21,8 @@ namespace Yu_Weather
             go.AddComponent<FFTOcean>();
             go.AddComponent<PlanarReflection>();
             go.GetComponent<PlanarReflection>().hideFlags = HideFlags.HideInInspector;
+            go.AddComponent<RenderWaterDepth>();
+            go.GetComponent<RenderWaterDepth>().hideFlags = HideFlags.HideInInspector;
 
             GameObjectUtility.SetParentAndAlign(go, command.context as GameObject);
             Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);

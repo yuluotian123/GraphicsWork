@@ -28,22 +28,19 @@ namespace Yu_Weather
     [GenerateHLSL(PackingRules.Exact, needAccessors = false, generateCBuffer = true, constantRegister = 4)]
     public unsafe struct shaderVariableWaterRendering
     {
-        public Vector4 _BaseColor;
-        public Vector4 _ShallowColor;
-
-        public float _Transparency;
         public float _MaxDepth;
+        public float _HeightExtra;
         public float _Fade;
         public float _Fresnel;
 
-        public float _Depth;
         public float _Reflect;
         public float _Refract;
+        public float _NormalBias;
         public float _NormalPower;
 
-        public float _NormalBias;
         public float _Shadow;
         public float _Shininess;
+        public float _SSSPow;
         public float _SSSscale;
 
         public Vector4 _SSSColor;

@@ -12,7 +12,6 @@ namespace Yu_Weather
     {
         Material fftOceanMaterial;
         Material BlurMaterial;
-        MaterialPropertyBlock BlurMaterialBlock;
 
         ComputeShader fftOceanCS;
         int Spectrumkernel;
@@ -154,19 +153,19 @@ namespace Yu_Weather
         }
 
         //BlurforBubblesSSS
-        public class DualKawaseBlurSettings
+        class DualKawaseBlurSettings
         {
             //升/降采样Pass次数
             public int blurPasses = 4;
             //blur filter
             public float blurRadius = 1.5f;
         }
-        public DualKawaseBlurSettings settings = new DualKawaseBlurSettings();
+        DualKawaseBlurSettings settings = new DualKawaseBlurSettings();
 
         RenderTexture[] downSampleRT;
         RenderTexture[] upSampleRT;
 
-        public void DualBoxBlur(CommandBuffer cmd, ScriptableRenderContext context,RenderTextureDescriptor desc,ref RenderTexture input,int passCount = 4,float blurRadius = 1.5f,int Index = 0)
+        private void DualBoxBlur(CommandBuffer cmd, ScriptableRenderContext context,RenderTextureDescriptor desc,ref RenderTexture input,int passCount = 4,float blurRadius = 1.5f,int Index = 0)
         {
             settings.blurPasses = passCount;
             settings.blurRadius = blurRadius;
@@ -249,12 +248,16 @@ namespace Yu_Weather
                 CoreUtils.SetKeyword(fftOceanMaterial, "RENDER_AP", m_renderingData.bRenderAerialPerspective);
             }
 
+            //surfaceTexture
             fftOceanMaterial.SetTexture(m_surfaceData._DisplaceTexture, m_surfaceData.DisplaceTexture);
             fftOceanMaterial.SetTexture(m_surfaceData._NormalTexture, m_surfaceData.NormalTexture);
             fftOceanMaterial.SetTexture(m_surfaceData._BubblesTexture, m_surfaceData.BubblesTexture);
 
+            //RenderingTexture
             fftOceanMaterial.SetTexture(m_renderingData._BubblesSSSTexture, m_renderingData.BubblesSSSTexture);
             fftOceanMaterial.SetTexture(m_renderingData._ReflectionTexture, m_renderingData.ReflectionTexture);
+            fftOceanMaterial.SetTexture(m_renderingData._AbsorptionScatteringRamp, m_renderingData.RampTexture);
+            fftOceanMaterial.SetTexture(m_renderingData._CausticsTexture, m_renderingData.CausticsTexture);
 
             if (!m_surfaceData.Infinite)
             {

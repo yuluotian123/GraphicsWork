@@ -25,20 +25,19 @@ CBUFFER_END
 // Generated from Yu_Weather.shaderVariableWaterRendering
 // PackingRules = Exact
 GLOBAL_CBUFFER_START(shaderVariableWaterRendering, b4)
-    float4 _BaseColor;
-    float4 _ShallowColor;
-    float _Transparency;
     float _MaxDepth;
+    float _HeightExtra;
     float _Fade;
     float _Fresnel;
-    float _Depth;
     float _Reflect;
     float _Refract;
-    float _NormalPower;
     float _NormalBias;
+    float _NormalPower;
     float _Shadow;
     float _Shininess;
+    float _SSSPow;
     float _SSSscale;
+    float4 _SSSColor;
 CBUFFER_END
 
 
