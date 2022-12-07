@@ -25,7 +25,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 76
+  controlID: 58
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 200}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 27
+  controlID: 53
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -391,7 +391,7 @@ MonoBehaviour:
       index: 10
       layout: 4
   m_WindowGUID: cc27987af1a868c49b0894db9c0f5429
-  m_Gizmos: 0
+  m_Gizmos: 1
   m_OverrideSceneCullingMask: 6917529027641081856
   m_SceneIsLit: 1
   m_SceneLighting: 1
@@ -400,9 +400,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 6.231551, y: 10.972938, z: 22.642378}
+    m_Target: {x: -91.676575, y: 51.382107, z: -73.23373}
     speed: 2
-    m_Value: {x: 6.231551, y: 10.972938, z: 22.642378}
+    m_Value: {x: -91.676575, y: 51.382107, z: -73.23373}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -449,9 +449,9 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.0045012264, y: 0.86988586, z: -0.029386962, w: -0.49240756}
+    m_Target: {x: 0.3103058, y: 0.5190615, z: -0.1952088, w: 0.7722517}
     speed: 2
-    m_Value: {x: -0.0045011127, y: 0.86986387, z: -0.029386219, w: -0.4923951}
+    m_Value: {x: 0.31027576, y: 0.51901126, z: -0.19518991, w: 0.772177}
   m_Size:
     m_Target: 0.8660254
     speed: 2
@@ -607,21 +607,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/myTinyWeatherSystem/Settings
+    - Assets/myTinyWeatherSystem/Runtime/SkySystem/Shaders/PhysicalBasedSky
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/myTinyWeatherSystem/Settings
+  - Assets/myTinyWeatherSystem/Runtime/SkySystem/Shaders/PhysicalBasedSky
   m_LastFoldersGridSize: -1
   m_LastProjectPath: G:\UnityProject\Final Work
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 646a0000
-    m_LastClickedID: 27236
+    m_SelectedIDs: 186e0000
+    m_LastClickedID: 28184
     m_ExpandedIDs: 00000000aa680000ac680000ae680000b0680000b2680000b4680000b6680000b8680000ba680000bc680000be680000c0680000c2680000c4680000c6680000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -675,9 +675,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 7c2d0000
-    m_LastClickedInstanceID: 11644
-    m_HadKeyboardFocusLastEvent: 1
+    m_SelectedInstanceIDs: 0c680000
+    m_LastClickedInstanceID: 26636
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000784f0000bc0a0100a2520000c2f1feff327100003e71000026710000fa550000685000006c51000052570000b6530000305200002e520000929d0000148500007252000076240000c22400008e560000426c000048b2000078240000745800005e5500004e5a00007c6500006223feffcc87000050e5ffff382d00004a2d0000502d00003a69000000000000d02d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -766,7 +766,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 36fbffff
+      m_ExpandedIDs: 34fbffff04680000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -819,7 +819,7 @@ MonoBehaviour:
   - {fileID: 16}
   - {fileID: 17}
   m_Selected: 0
-  m_LastSelected: 2
+  m_LastSelected: 4
 --- !u!114 &13
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -855,7 +855,7 @@ MonoBehaviour:
     m_CachedPref: 160
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: -1
+  m_LastInspectedObjectInstanceID: 26648
   m_LastVerticalScrollValue: 0
   m_GlobalObjectId: 
   m_InspectorMode: 0
@@ -980,9 +980,9 @@ MonoBehaviour:
   m_ListWidth: 200
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 00000000
+    m_SelectedIDs: ffffffff
     m_LastClickedID: 0
-    m_ExpandedIDs: cdffffffd4ffffffd6ffffffdcffffffdfffffffe4ffffffe5ffffffe6ffffffe7ffffffe8ffffffe9ffffffeaffffffebffffffecffffffedffffffeefffffff0fffffff1fffffff2fffffff3fffffff4fffffff5fffffff6fffffff8fffffff9fffffffafffffffbfffffffcfffffffdfffffffeffffff00000000
+    m_ExpandedIDs: cdffffffd4ffffffd6ffffffdcffffffdfffffffe4ffffffe5ffffffe6ffffffe7ffffffe8ffffffe9ffffffeaffffffebffffffecffffffedffffffeeffffffeffffffff0fffffff1fffffff2fffffff3fffffff4fffffff5fffffff6fffffff8fffffff9fffffffafffffffbfffffffcfffffffdfffffffeffffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

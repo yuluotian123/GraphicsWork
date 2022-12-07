@@ -4,7 +4,7 @@
 #include "shaderVariableWater.cs.hlsl"
 #define G 9.81f
 #define MAX_TESSELLATION_FACTORS 32.0 
-#define HeightExtra 4.0f
+#define HeightExtra 15.0f
 
 TEXTURE2D_X_FLOAT(_WaterDepthTexture);   SAMPLER(sampler_WaterDepthTexture_linear_clamp);
 float4 _WaterDepthParams;//xyz:camPosition w:camSize
