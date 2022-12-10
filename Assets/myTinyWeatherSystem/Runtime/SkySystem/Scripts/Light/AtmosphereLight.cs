@@ -93,7 +93,7 @@ namespace Yu_Weather
 
         private void Update()
         {
-            if (affectScene && dirLight&&dirLight.type==LightType.Directional)
+            if (affectScene && dirLight && dirLight.type==LightType.Directional&&lightIndex==0)
             {
                 dirLight.color = lightIlluminanceOnGround;
                 dirLight.transform.rotation = transform.rotation;

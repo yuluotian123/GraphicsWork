@@ -58,8 +58,8 @@ MonoBehaviour:
   m_UseSRPBatcher: 1
   m_SupportsDynamicBatching: 0
   m_MixedLightingSupported: 1
-  m_SupportsLightLayers: 0
-  m_DebugLevel: 0
+  m_SupportsLightLayers: 1
+  m_DebugLevel: 1
   m_UseAdaptivePerformance: 1
   m_ColorGradingMode: 1
   m_ColorGradingLutSize: 32
@@ -69,6 +69,6 @@ MonoBehaviour:
   m_LocalShadowsAtlasResolution: 256
   m_MaxPixelLights: 0
   m_ShadowAtlasResolution: 256
-  m_ShaderVariantLogLevel: 0
+  m_ShaderVariantLogLevel: 2
   m_VolumeFrameworkUpdateMode: 0
   m_ShadowCascades: 1

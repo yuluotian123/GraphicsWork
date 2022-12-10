@@ -33,17 +33,17 @@ Shader "Yu_Weather/GrassShader"
 
     SubShader
     {
-        Tags { "RenderPipeline"="UniversalRenderPipeline""RenderType" ="TransparentCutout" "Queue"="Transparent" "Layer"="Grass"}
+        Tags { "RenderPipeline"="UniversalRenderPipeline" "RenderType" ="TransparentCutout" "Queue"="Transparent" "Layer"="Grass"}
         LOD 100
         Cull Off
         HLSLINCLUDE
-        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 		#pragma shader_feature_local _NORMALUP_ON 
 		#pragma shader_feature_local _SHADOWCAST_ON 
 
-        #pragma target 4.6
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+
 		TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
 		TEXTURE2D(_AlphaTex);   SAMPLER(sampler_AlphaTex);
 		float3 _PositionMoving; 
@@ -127,14 +127,16 @@ Shader "Yu_Weather/GrassShader"
 
         Pass
         {
+		    Tags {"LightMode"="UniversalForward"}
             HLSLPROGRAM
+			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile _ _SHADOWS_SOFT
             #pragma vertex vert
             #pragma fragment frag
             #pragma geometry geom
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-			#pragma multi_compile _ _SHADOWS_SOFT
             g2f geomOut(float3 normal, float3 pos, float2 uv)
             {
             	g2f o;

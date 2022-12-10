@@ -74,7 +74,7 @@ float _AerialPespectiveViewDistanceScale;
             if (t < 0.0f) { 
 		        // GetLightDiskLuminance contains a tiny soft edge effect
                 float3 LightDiskLuminance = GetLightDiskLuminance(WorldPos, WorldDir, _BottomRadiusKm, _TopRadiusKm ,
-                _AtmosphereLightDirection[0],_AtmosphereLightDiskCosHalfApexAngle[0],_AtmosphereLightDiskLuminance[0]);
+                _AtmosphereLightDirection[0].xyz,_AtmosphereLightDiskCosHalfApexAngle[0].x,_AtmosphereLightDiskLuminance[0].rgb);
 
                 //To Do:Texture 
 		        //float3 ExposedLightLuminance = LightDiskLuminance * OutputPreExposure;
@@ -87,7 +87,7 @@ float _AerialPespectiveViewDistanceScale;
             if (t < 0.0f) { 
 		        // GetLightDiskLuminance contains a tiny soft edge effect
                 float3 LightDiskLuminance = GetLightDiskLuminance(WorldPos, WorldDir, _BottomRadiusKm, _TopRadiusKm ,
-                _AtmosphereLightDirection[1],_AtmosphereLightDiskCosHalfApexAngle[1],_AtmosphereLightDiskLuminance[1]);
+                _AtmosphereLightDirection[1].xyz,_AtmosphereLightDiskCosHalfApexAngle[1].x,_AtmosphereLightDiskLuminance[1].rgb);
 
                 //To Do:Texture 
 		        //float3 ExposedLightLuminance = LightDiskLuminance * OutputPreExposure;

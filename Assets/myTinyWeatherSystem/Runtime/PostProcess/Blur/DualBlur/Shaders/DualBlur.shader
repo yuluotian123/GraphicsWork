@@ -38,7 +38,7 @@ Shader "Yu_Weather/DualKawaseBlur"
             CBUFFER_END
 
             float _Offset;
-            TEXTURE2D(_MainTex);          SAMPLER(sampler_MainTex);
+            TEXTURE2D(_MainTex);          SAMPLER(sampler_MainTex_linear_repeat);
 
             v2f vert (appdata v)
             {
@@ -60,11 +60,11 @@ Shader "Yu_Weather/DualKawaseBlur"
 
             half4 frag (v2f i) : SV_Target
             {
-                half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv) * 4;
-                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv01.xy);
-                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv01.zw);
-                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv23.xy);
-                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv23.zw);
+                half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv) * 4;
+                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv01.xy);
+                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv01.zw);
+                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv23.xy);
+                col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv23.zw);
 
                 return col * 0.125;
             }
@@ -102,7 +102,7 @@ Shader "Yu_Weather/DualKawaseBlur"
             CBUFFER_END
 
             float _Offset;
-            TEXTURE2D(_MainTex);          SAMPLER(sampler_MainTex);
+            TEXTURE2D(_MainTex);          SAMPLER(sampler_MainTex_linear_repeat);
 
             v2f vert (appdata v)
             {
@@ -128,14 +128,14 @@ Shader "Yu_Weather/DualKawaseBlur"
             half4 frag (v2f i) : SV_Target
             {
                half4 col = 0;
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv01.xy);
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv01.zw) * 2;
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv23.xy);
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv23.zw) * 2;
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv45.xy);
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv45.zw) * 2;
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv67.xy);
-               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv67.zw) * 2;
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv01.xy);
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv01.zw) * 2;
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv23.xy);
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv23.zw) * 2;
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv45.xy);
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv45.zw) * 2;
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv67.xy);
+               col += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex_linear_repeat, i.uv67.zw) * 2;
 
                 return col * 0.0833;
             }

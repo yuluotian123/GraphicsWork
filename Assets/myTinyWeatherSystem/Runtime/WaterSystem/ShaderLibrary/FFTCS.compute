@@ -1,0 +1,179 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel GenerateSpectrum
+#pragma kernel ComputeFFT
+#pragma kernel GenerateDisplace
+#pragma kernel GenerateNormalAndBubbles
+
+#pragma multi_compile _ IS_END
+#pragma multi_compile _ IS_DISPLACE
+#pragma multi_compile _ IS_HORIZONTAL
+#include "WaterCommon.hlsl"
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> _GaussianTexture;
+RWTexture2D<float4> _HeightSpectrumTexture;
+RWTexture2D<float4> _DisplaceSpectrumTexture;
+RWTexture2D<float4> _InputRT; //input
+RWTexture2D<float4> _OutputRT; //output
+RWTexture2D<float4> _DisplaceTexture;
+RWTexture2D<float4> _NormalTexture;
+RWTexture2D<float4> _BubblesTexture;
+
+int Ns; //Ns = pow(2,m-1)
+
+[numthreads(8,8,1)]
+void GenerateSpectrum(uint3 id : SV_DispatchThreadID)
+{
+    float2 k = float2(2.0f * PI * id.x / _FFTSize - PI, 2.0f * PI * id.y / _FFTSize - PI);
+
+    float2 gaussian = _GaussianTexture[id.xy].xy;
+
+    float2 hTilde0 = gaussian * sqrt(abs(phillips(k) * DonelanBannerDirectionalSpreading(k)) / 2.0f);
+    float2 hTilde0Conj = gaussian * sqrt(abs(phillips(-k) * DonelanBannerDirectionalSpreading(-k)) / 2.0f);
+    hTilde0Conj.y *= -1.0f;
+
+    float omegat = dispersion(k) * _MTime;
+    float c = cos(omegat);
+    float s = sin(omegat);
+    
+    float2 h1 = complexMultiply(hTilde0, float2(c, s));
+    float2 h2 = complexMultiply(hTilde0Conj, float2(c, -s));
+
+    float2 HTilde = h1 + h2;
+    
+    k /= max(0.001f, length(k));
+    float2 KxHTilde = complexMultiply(float2(0, -k.x), HTilde);
+    float2 kzHTilde = complexMultiply(float2(0, -k.y), HTilde);
+
+    _HeightSpectrumTexture[id.xy] = float4(HTilde, 0, 0);
+    _DisplaceSpectrumTexture[id.xy] = float4(KxHTilde, kzHTilde);
+}
+
+[numthreads(8, 8, 1)]
+void ComputeFFT(uint3 id : SV_DispatchThreadID)
+{       
+#ifdef IS_HORIZONTAL
+    int2 idxs = id.xy;
+    float N = _FFTSize;
+    idxs.x = floor(id.x / (Ns * 2.0f)) * Ns + id.x % Ns;
+    float angle = 2.0f * PI * (id.x / (Ns * 2.0f));
+    float2 w = float2(cos(angle), sin(angle));
+
+#ifdef IS_END
+     w *= -1;
+#endif
+    
+    float2 x0 = _InputRT[idxs].xy;
+    float2 x1 = _InputRT[int2(idxs.x + N * 0.5f, idxs.y)].xy;
+
+    float2 output = x0 + float2(w.x * x1.x - w.y * x1.y, w.x * x1.y + w.y * x1.x);
+    
+#ifdef IS_END
+    int x = id.x - N * 0.5f;
+    output *= ((x + 1) % 2.0f) * 1 + (x % 2.0f) * (-1);
+#endif
+
+    _OutputRT[id.xy] = float4(output, 0, 0);   
+    
+#ifdef IS_DISPLACE
+    float2 x02 = _InputRT[idxs].zw;
+    float2 x12 = _InputRT[int2(idxs.x + N * 0.5f, idxs.y)].zw;
+
+    float2 output2 = x02 + float2(w.x * x12.x - w.y * x12.y, w.x * x12.y + w.y * x12.x);
+#ifdef IS_END
+    output2 *= ((x + 1) % 2.0f) * 1 + (x % 2.0f) * (-1);
+#endif
+
+    _OutputRT[id.xy] = float4( output,output2);   
+#endif
+    
+#else
+    int2 idxs = id.xy;
+    float N = _FFTSize;
+    idxs.y = floor(id.y / (Ns * 2.0f)) * Ns + id.y % Ns;
+    float angle = 2.0f * PI * (id.y / (Ns * 2.0f));
+    float2 w = float2(cos(angle), sin(angle));
+    
+#ifdef IS_END
+     w *= -1;
+#endif
+    
+    float2 x0 = _InputRT[idxs].xy;
+    float2 x1 = _InputRT[int2(idxs.x, idxs.y + N * 0.5f)].xy;
+
+    float2 output = x0 + float2(w.x * x1.x - w.y * x1.y, w.x * x1.y + w.y * x1.x);
+    
+#ifdef IS_END   
+    int x = id.y - N * 0.5f;
+    output *= ((x + 1) % 2.0f) * 1 + (x % 2.0f) * (-1);
+#endif
+    
+    _OutputRT[id.xy] = float4(output, 0, 0);
+    
+#ifdef IS_DISPLACE
+    float2 x02 = _InputRT[idxs].zw;
+    float2 x12 = _InputRT[int2(idxs.x, idxs.y + N * 0.5f)].zw;
+
+    float2 output2 = x02 + float2(w.x * x12.x - w.y * x12.y, w.x * x12.y + w.y * x12.x);
+#ifdef IS_END   
+    output2 *= ((x + 1) % 2.0f) * 1 + (x % 2.0f) * (-1);
+#endif
+    
+    _OutputRT[id.xy] = float4(output, output2);
+#endif
+    
+#endif
+
+}
+
+[numthreads(8, 8, 1)]
+void GenerateDisplace(uint3 id : SV_DispatchThreadID)
+{
+    float y = length(_HeightSpectrumTexture[id.xy].xy) / (_FFTSize * _FFTSize) * _HeightScale; //y
+    float x = length(_DisplaceSpectrumTexture[id.xy].xy) / (_FFTSize * _FFTSize) * _Lambda; //x
+    float z = length(_DisplaceSpectrumTexture[id.xy].zw) / (_FFTSize * _FFTSize) * _Lambda; //z
+    
+    _DisplaceTexture[id.xy] = float4(x, y, z, 0);
+}
+
+[numthreads(8, 8, 1)]
+void GenerateNormalAndBubbles(uint3 id : SV_DispatchThreadID)
+{
+    float uintLength = _MeshLength*_MeshScale.z/ (_FFTSize - 1.0f);
+    //Get UV of 4 points
+    uint2 uvX1 = uint2((id.x - 1.0f + _FFTSize) % _FFTSize, id.y);
+    uint2 uvX2 = uint2((id.x + 1.0f + _FFTSize) %  _FFTSize, id.y);
+    uint2 uvZ1 = uint2(id.x, (id.y - 1.0f + _FFTSize) % _FFTSize);
+    uint2 uvZ2 = uint2(id.x, (id.y + 1.0f + _FFTSize) % _FFTSize);
+
+    //Get Displace
+    float3 x1D = _DisplaceTexture[uvX1].xyz;
+    float3 x2D = _DisplaceTexture[uvX2].xyz;
+    float3 z1D = _DisplaceTexture[uvZ1].xyz;
+    float3 z2D = _DisplaceTexture[uvZ2].xyz;
+    
+    //position of near four points
+    float3 x1 = float3(x1D.x - uintLength, x1D.yz); 
+    float3 x2 = float3(x2D.x + uintLength, x2D.yz); 
+    float3 z1 = float3(z1D.xy, z1D.z - uintLength); 
+    float3 z2 = float3(z1D.xy, z1D.z + uintLength);
+    
+    //calculate tangents
+    float3 tangentX = x2 - x1;
+    float3 tangentZ = z2 - z1;
+    
+    //Get Normal
+    float3 normal = normalize(cross(tangentZ, tangentX));
+    
+    //Bubbles
+    float3 ddx = x2D - x1D;
+    float3 ddz = z2D - z1D;  
+    //jacobian
+    float jacobian = (1.0f + ddx.x) * (1.0f + ddz.z) - ddx.z * ddz.x;
+
+    jacobian = saturate(max(0, _BubblesThreshold - saturate(jacobian)) * _BubblesScale);
+
+    _NormalTexture[id.xy] = float4(normal, 0);
+    _BubblesTexture[id.xy] = float4(jacobian, jacobian, jacobian, 0);
+}
+
