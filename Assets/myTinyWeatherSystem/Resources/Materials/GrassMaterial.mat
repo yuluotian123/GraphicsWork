@@ -37,10 +37,10 @@ Material:
     - _LodDis1: 10
     - _LodDis2: 500
     - _NormalUp: 1
-    - _Radius: 2
+    - _Radius: 4
     - _ShadowCast: 0
     - _SpecIntensity: 0.5
-    - _Strength: 3
+    - _Strength: 5
     - _Width: 0.03
     - _WidthRan: 0.01
     - _WindEff: 0.5
