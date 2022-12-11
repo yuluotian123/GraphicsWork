@@ -158,6 +158,7 @@ namespace Yu_Weather
                 if (!planes[i].GetSide(point))
                 {
                     return false;
+                    
                 }
             }
             return true;

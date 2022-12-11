@@ -38,8 +38,15 @@ namespace Yu_Weather
         static private void GetCalLog(in string[] fileName,in string fileExtension,ref int Line,ref int Length)
         {
             int totalLine = 0; //代码总行数
+            int escape = 0;
             foreach (var temp in fileName)
             {
+                if (temp.Contains("Assets\\3rd"))
+                {
+                    escape++;
+                    continue;
+                }
+
                 int nowLine = 0; //当前文件累计行数
                 StreamReader sr = new StreamReader(temp);
                 while (sr.ReadLine() != null)
@@ -48,42 +55,10 @@ namespace Yu_Weather
                 }
                 totalLine += nowLine;
             }
-            Debug.Log(string.Format("文件后缀{0}:代码总行数: {1} -> 代码文件数:{2}",fileExtension,totalLine, fileName.Length));
+            Debug.Log(string.Format("文件后缀{0}:代码总行数: {1} -> 代码文件数:{2}",fileExtension,totalLine, fileName.Length - escape));
 
             Line += totalLine;
-            Length += fileName.Length;
-        }
-    }
-
-    public class ShaderVS
-    {
-        [MenuItem("Tools/启用VSCode编辑Shader文件")]
-        public static void OpenVSCode()
-        {
-            UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
-        }
-    }
-
-    public class ShaderEditor
-    {
-        [OnOpenAssetAttribute(1)]
-        public static bool step1(int instanceID, int line)
-        {
-            string path = AssetDatabase.GetAssetPath(EditorUtility.InstanceIDToObject(instanceID));
-            string name = Application.dataPath + "/" + path.Replace("Assets/", "");
-            if (name.EndsWith(".shader"))    //文件扩展名类型
-            {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = "D:/vscode/Code.exe";   //VSCODE程序
-                startInfo.Arguments = name;
-                process.StartInfo = startInfo;
-                process.Start();
-                return true;
-            }
-
-            return false;
+            Length += fileName.Length - escape;
         }
     }
 }
