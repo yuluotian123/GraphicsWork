@@ -59,6 +59,8 @@ namespace Yu_Weather
         public float _FoamRange;
 
         public Vector4 _FoamColor;
+
+        public Vector4 _SeaColor;
     }
 
 }

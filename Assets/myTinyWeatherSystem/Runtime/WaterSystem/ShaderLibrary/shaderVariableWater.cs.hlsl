@@ -49,6 +49,7 @@ GLOBAL_CBUFFER_START(shaderVariableWaterRendering, b4)
     float _FoamScale;
     float _FoamRange;
     float4 _FoamColor;
+    float4 _SeaColor;
 CBUFFER_END
 
 

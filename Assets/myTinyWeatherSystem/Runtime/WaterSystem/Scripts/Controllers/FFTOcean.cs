@@ -50,7 +50,6 @@ namespace Yu_Weather
         public float normalScale = 0.125f;
 
         [Foldout("泡沫设定")]
-        public Texture2D foamRamp;
         public Texture2D foamMap;
         public Color foamColor = new Vector4(1, 1, 1, 1);
         public float bubblesScale = 1f;  //泡沫强度
@@ -59,9 +58,8 @@ namespace Yu_Weather
         public float foamAdd = 0.5f;
         public float foamRange = 0.1f;
         public float foamScale = 0.8f;
-
-        [Foldout("近岸海浪(to do)")]
-        public bool nearShore = false;
+        [HideInInspector]
+        public Texture2D foamRamp;
 
         [Foldout("水面反射和折射")]
         public ReflectionMode reflectionMode = ReflectionMode.REFLECTPROBE;
@@ -79,32 +77,38 @@ namespace Yu_Weather
         public float reflect = 10f;
         public float refract = 0.05f;
         public float fresnel = 0.04f;
-        public float normalStrength = 4f;
-        public float normalBias = 3f;
+        public float normalStrength = 1f;
+        public float normalBias = 1f;
 
         [Foldout("水面颜色")]
         [Header("基础颜色")]
+        [ColorUsage(false,true)]
+        public Color seaColor;
         public Gradient absorptionRamp;
         public Gradient scatterRamp;
-        [Header("深度设置")]
+        [Header("高度和深度设置")]
         public bool perCamDepth = false;
         public float maxDepth = 40.0f;
         public float CamSize = 128;
         public float depthExtra = 40.0f;
+        public float maxWaveHeight = 20.0f;
         [Header("SSS")]
         public Color SSSColor = new Color(0.4f, 0.8f, 0.8f, 1f);
         public float sssNormalDistortion = 0.5f;
         public float sssScale = 1f;
         public float sssPow = 0.5f;
-        public float maxWaveHeightForSSS = 20.0f;
-        [Header("焦散")]
-        public Texture2D CausticsTexture;
 
         [Foldout("水面光照")]
         public Color SpecColor = new Color(1.0f,1.0f,1.0f,1.0f);
         public float lightIntensityScale = 0.5f;
         public float shinness = 32f;
         public float shadow = 0.35f;
+
+        [Foldout("近岸海浪(to do)")]
+        public bool nearShore = false;
+
+        [Foldout("焦散(to do)")]
+        public Texture2D CausticsTexture;
 
         [HideInInspector]
         public float time = 0;

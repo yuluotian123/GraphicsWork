@@ -252,7 +252,7 @@ namespace Yu_Weather
             renderParameters._NormalBias = fftOcean.normalBias;
 
             renderParameters._SSSDistortion = fftOcean.sssNormalDistortion;
-            renderParameters._SSSMaxWaveHeight = fftOcean.maxWaveHeightForSSS + fftOcean.transform.position.y;
+            renderParameters._SSSMaxWaveHeight = fftOcean.maxWaveHeight + fftOcean.transform.position.y;
             renderParameters._SSSPow = fftOcean.sssPow;
             renderParameters._SSSscale = fftOcean.sssScale;
 
@@ -270,6 +270,8 @@ namespace Yu_Weather
             renderParameters._FoamScale = fftOcean.foamScale;
             renderParameters._FoamRange = fftOcean.foamRange;
             renderParameters._FoamColor = fftOcean.foamColor;
+
+            renderParameters._SeaColor = fftOcean.seaColor;
         }
 
         public void UpdatePerCamera(ref ViewSkyInfo _viewSkyInfo,bool _bRenderAerialPerspective,FFTOcean fftOcean)
